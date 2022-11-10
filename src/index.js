@@ -2,6 +2,7 @@ import { KeyboardControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { createRoot } from 'react-dom/client';
 import App from './App';
+import Interface from './components/Interface';
 
 const root = createRoot(document.querySelector('#root'));
 
@@ -26,5 +27,6 @@ root.render(
     >
       <App />
     </Canvas>
+    <Interface />
   </KeyboardControls>
 );

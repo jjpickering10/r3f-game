@@ -2,11 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Bebas Neue';
+  src: url('../public/fonts/bebas-neue-v9-latin-regular.woff');
+}
+
 @layer base {
   body,
   html,
   #root {
-    @apply fixed top-0 left-0 w-full h-full bg-slate-600;
+    @apply fixed top-0 left-0 w-full h-full bg-slate-600 font-bebas;
+  }
+  .controls {
+    @apply absolute bottom-[10%] left-0 w-full;
+  }
+
+  .controls .raw {
+    @apply flex justify-center;
+  }
+
+  .controls .key {
+    @apply w-[40px] h-[40px] m-1 border-2 border-white bg-white bg-opacity-50;
+  }
+
+  .controls .key.large {
+    @apply w-[144px];
+  }
+
+  .controls .key.active {
+    @apply bg-white opacity-90;
   }
 }
 
