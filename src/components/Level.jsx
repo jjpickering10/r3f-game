@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { RigidBody } from '@react-three/rapier';
 import { useState, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useGLTF } from '@react-three/drei';
 
 THREE.ColorManagement.legacyMode = false;
 
@@ -23,6 +24,30 @@ const Start = ({ position = [0, 0, 0] }) => {
         material={floorOneMaterial}
         scale={[4, 0.2, 4]}
       ></mesh>
+    </group>
+  );
+};
+const End = ({ position = [0, 0, 0] }) => {
+  const hamburger = useGLTF('./hamburger.glb');
+  hamburger.scene.children.forEach((child) => (child.castShadow = true));
+  return (
+    <group position={position}>
+      <mesh
+        position={[0, 0, 0]}
+        receiveShadow
+        geometry={boxGeometry}
+        material={floorOneMaterial}
+        scale={[4, 0.2, 4]}
+      ></mesh>
+      <RigidBody
+        type={'fixed'}
+        colliders={'hull'}
+        restitution={0.2}
+        friction={0}
+        position={[0, 0.25, 0]}
+      >
+        <primitive object={hamburger.scene} scale={0.2} />
+      </RigidBody>
     </group>
   );
 };
@@ -149,10 +174,11 @@ const Axe = ({ position = [0, 0, 0] }) => {
 const Level = () => {
   return (
     <>
-      <Start position={[0, 0, 12]} />
-      <Spinner position={[0, 0, 8]} />
-      <Limbo position={[0, 0, 4]} />
-      <Axe position={[0, 0, 0]} />
+      <Start position={[0, 0, 0]} />
+      {/* <Spinner position={[0, 0, 12]} />
+      <Limbo position={[0, 0, 8]} />
+      <Axe position={[0, 0, 4]} />
+      <End position={[0, 0, 0]} /> */}
     </>
   );
 };
