@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { RigidBody } from '@react-three/rapier';
-import { useState, useRef } from 'react';
+import { CuboidCollider, RigidBody } from '@react-three/rapier';
+import { useState, useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 
@@ -51,7 +51,7 @@ const End = ({ position = [0, 0, 0] }) => {
     </group>
   );
 };
-const Spinner = ({ position = [0, 0, 0] }) => {
+export const Spinner = ({ position = [0, 0, 0] }) => {
   const [speed, setSpeed] = useState(
     () => (Math.random() + 0.2) * (Math.random() < 0.5 ? -1 : 1)
   );
@@ -91,7 +91,7 @@ const Spinner = ({ position = [0, 0, 0] }) => {
   );
 };
 
-const Limbo = ({ position = [0, 0, 0] }) => {
+export const Limbo = ({ position = [0, 0, 0] }) => {
   const [offset, setOffset] = useState(() => Math.random() * Math.PI * 2);
   const obstacle = useRef();
   useFrame((state) => {
@@ -131,7 +131,7 @@ const Limbo = ({ position = [0, 0, 0] }) => {
   );
 };
 
-const Axe = ({ position = [0, 0, 0] }) => {
+export const Axe = ({ position = [0, 0, 0] }) => {
   const [offset, setOffset] = useState(() => Math.random() * Math.PI * 2);
   const obstacle = useRef();
   useFrame((state) => {
@@ -171,16 +171,63 @@ const Axe = ({ position = [0, 0, 0] }) => {
   );
 };
 
-const Level = () => {
+export const Bounds = ({ length = 1 }) => {
   return (
     <>
-      <Start position={[0, 0, 0]} />
-      {/* <Spinner position={[0, 0, 12]} />
-      <Limbo position={[0, 0, 8]} />
-      <Axe position={[0, 0, 4]} />
-      <End position={[0, 0, 0]} /> */}
+      <RigidBody type={'fixed'} restitution={0.2} friction={0}>
+        <mesh
+          position={[2.15, 0.75, -(length * 2) + 2]}
+          geometry={boxGeometry}
+          material={wallMaterial}
+          scale={[0.3, 1.5, 4 * length]}
+          castShadow
+        />
+        <mesh
+          position={[-2.15, 0.75, -(length * 2) + 2]}
+          geometry={boxGeometry}
+          material={wallMaterial}
+          scale={[0.3, 1.5, 4 * length]}
+          receiveShadow
+        />
+        <mesh
+          position={[0, 0.75, -(length * 4) + 2]}
+          geometry={boxGeometry}
+          material={wallMaterial}
+          scale={[4, 1.5, 0.3]}
+          receiveShadow
+        />
+        <CuboidCollider
+          args={[2, 0.1, 2 * length]}
+          position={[0, -0.1, -(length * 2) + 2]}
+          restitution={0.2}
+          friction={1}
+        />
+      </RigidBody>
     </>
   );
 };
 
-export default Level;
+export const Level = ({ count = 5, types = [Spinner, Axe, Limbo] }) => {
+  const blocks = useMemo(() => {
+    const blocks = [];
+    for (let i = 0; i < count; i++) {
+      const blockType = types[Math.floor(Math.random() * types.length)];
+      blocks.push(blockType);
+    }
+    return blocks;
+  }, [count, types]);
+
+  return (
+    <>
+      <Start position={[0, 0, 0]} />
+      {blocks.map((Block, index) => (
+        <Block key={index} position={[0, 0, -(index + 1) * 4]} />
+      ))}
+      {/* <Spinner position={[0, 0, 12]} />
+      <Limbo position={[0, 0, 8]} />
+      <Axe position={[0, 0, 4]} /> */}
+      <End position={[0, 0, -(count + 1) * 4]} />
+      <Bounds length={count + 2} />
+    </>
+  );
+};

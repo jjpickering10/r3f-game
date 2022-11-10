@@ -2,7 +2,7 @@ import React from 'react';
 import { OrbitControls } from '@react-three/drei';
 import { Physics, Debug } from '@react-three/rapier';
 import Lights from './Lights';
-import Level from './Level';
+import { Level, Spinner, Axe, Limbo } from './Level';
 
 const Experience = () => {
   return (
