@@ -8,7 +8,7 @@ import Player from './Player';
 const Experience = () => {
   return (
     <>
-      <OrbitControls makeDefault />
+      {/* <OrbitControls makeDefault /> */}
       <Physics>
         {/* <Debug /> */}
         <Lights />
