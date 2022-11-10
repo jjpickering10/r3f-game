@@ -3,6 +3,7 @@ import { RigidBody, useRapier } from '@react-three/rapier';
 import { useKeyboardControls } from '@react-three/drei';
 import React, { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import useGame from '../stores/useGame';
 
 const Player = () => {
   const ballRef = useRef();
@@ -15,6 +16,10 @@ const Player = () => {
   const [smoothCameraTarget, setSmoothCameraTarget] = useState(
     () => new THREE.Vector3()
   );
+  const start = useGame((state) => state.start);
+  const end = useGame((state) => state.end);
+  const restart = useGame((state) => state.restart);
+  const blocksCount = useGame((state) => state.blocksCount);
   useFrame((state, delta) => {
     // Controls
     const { forward, backward, leftward, rightward } = getKeys();
@@ -57,6 +62,15 @@ const Player = () => {
 
     state.camera.position.copy(smoothCameraPosition);
     state.camera.lookAt(smoothCameraTarget);
+
+    // Phases
+
+    if (ballPosition.z < -(blocksCount * 4 + 2)) {
+      end();
+    }
+    if (ballPosition.y < -4) {
+      restart();
+    }
   });
 
   const jump = () => {
@@ -68,9 +82,25 @@ const Player = () => {
     if (hit.toi < 0.15) {
       ballRef.current.applyImpulse({ x: 0, y: 0.5, z: 0 });
     }
-    console.log(hit.toi);
   };
+
+  const reset = () => {
+    ballRef.current.setTranslation({ x: 0, y: 1, z: 0 });
+    ballRef.current.setLinvel({ x: 0, y: 0, z: 0 });
+    ballRef.current.setAngvel({ x: 0, y: 0, z: 0 });
+  };
+
   useEffect(() => {
+    const unsubscribeReset = useGame.subscribe(
+      (state) => {
+        return state.phase;
+      },
+      (phase) => {
+        if (phase === 'ready') {
+          reset();
+        }
+      }
+    );
     const unsubscribeJump = subscribeKeys(
       (state) => state.jump,
       (value) => {
@@ -79,8 +109,14 @@ const Player = () => {
         }
       }
     );
+
+    const unsubscribeAny = subscribeKeys(() => {
+      start();
+    });
     return () => {
       unsubscribeJump();
+      unsubscribeAny();
+      unsubscribeReset();
     };
   }, []);
   return (
