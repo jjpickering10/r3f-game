@@ -2,21 +2,49 @@ import * as THREE from 'three';
 import { CuboidCollider, RigidBody } from '@react-three/rapier';
 import { useState, useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { useGLTF } from '@react-three/drei';
+import { Float, Text, useGLTF } from '@react-three/drei';
 
 THREE.ColorManagement.legacyMode = false;
 
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
-const floorOneMaterial = new THREE.MeshStandardMaterial({ color: 'limegreen' });
-const floorTwoMaterial = new THREE.MeshStandardMaterial({
-  color: 'greenyellow',
+const floorOneMaterial = new THREE.MeshStandardMaterial({
+  color: '#111111',
+  metalness: 0,
+  roughness: 0,
 });
-const obstacleMaterial = new THREE.MeshStandardMaterial({ color: 'orangered' });
-const wallMaterial = new THREE.MeshStandardMaterial({ color: 'slategrey' });
+const floorTwoMaterial = new THREE.MeshStandardMaterial({
+  color: '#222222',
+  metalness: 0,
+  roughness: 0,
+});
+const obstacleMaterial = new THREE.MeshStandardMaterial({
+  color: '#ff0000',
+  metalness: 0,
+  roughness: 1,
+});
+const wallMaterial = new THREE.MeshStandardMaterial({
+  color: '#887777',
+  metalness: 0,
+  roughness: 0,
+});
 
 const Start = ({ position = [0, 0, 0] }) => {
   return (
     <group position={position}>
+      <Float floatIntensity={0.25} rotationIntensity={0.25}>
+        <Text
+          font='/fonts/bebas-neue-v9-latin-regular.woff'
+          scale={4}
+          maxWidth={0.25}
+          lineHeight={0.75}
+          position={[0.75, 0.65, 0]}
+          rotation-y={-0.25}
+          textAlign={'right'}
+        >
+          Marble Race
+          <meshBasicMaterial toneMapped={false} />
+        </Text>
+      </Float>
       <mesh
         position={[0, -0.1, 0]}
         receiveShadow
@@ -32,6 +60,14 @@ const End = ({ position = [0, 0, 0] }) => {
   hamburger.scene.children.forEach((child) => (child.castShadow = true));
   return (
     <group position={position}>
+      <Text
+        font='/fonts/bebas-neue-v9-latin-regular.woff'
+        scale={8}
+        position={[0, 2.25, 2]}
+      >
+        FINISH
+        <meshBasicMaterial toneMapped={false} />
+      </Text>
       <mesh
         position={[0, 0, 0]}
         receiveShadow
@@ -207,7 +243,11 @@ export const Bounds = ({ length = 1 }) => {
   );
 };
 
-export const Level = ({ count = 5, types = [Spinner, Axe, Limbo] }) => {
+export const Level = ({
+  count = 5,
+  types = [Spinner, Axe, Limbo],
+  seed = 0,
+}) => {
   const blocks = useMemo(() => {
     const blocks = [];
     for (let i = 0; i < count; i++) {
@@ -215,7 +255,7 @@ export const Level = ({ count = 5, types = [Spinner, Axe, Limbo] }) => {
       blocks.push(blockType);
     }
     return blocks;
-  }, [count, types]);
+  }, [count, types, seed]);
 
   return (
     <>

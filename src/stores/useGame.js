@@ -5,7 +5,8 @@ import React from 'react';
 export default create(
   subscribeWithSelector((set) => {
     return {
-      blocksCount: 3,
+      blocksCount: 10,
+      blocksSeed: 0,
       startTime: 0,
       endTime: 0,
       phase: 'ready',
@@ -25,6 +26,7 @@ export default create(
           if (state.phase === 'playing' || state.phase === 'ended') {
             return {
               phase: 'ready',
+              blocksSeed: Math.random(),
             };
           }
           return {};
